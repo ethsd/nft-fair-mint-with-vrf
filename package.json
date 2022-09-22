@@ -1,0 +1,23 @@
+{
+  "name": "nft-fair-mint-with-vrf",
+  "version": "1.0.0",
+  "description": "An ETH SD technical workshop using the SmartPiggies NFT fair mint process with Chainlink VRFs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ethsd/nft-fair-mint-with-vrf.git"
+  },
+  "author": "tobyjaguar",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/ethsd/nft-fair-mint-with-vrf/issues"
+  },
+  "homepage": "https://github.com/ethsd/nft-fair-mint-with-vrf#readme",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^2.0.0",
+    "hardhat": "^2.11.2"
+  }
+}
