@@ -5,6 +5,8 @@ import "./openzeppelin/ERC721.sol";
 import "./openzeppelin/Strings.sol";
 
 error OnlyTheOwnerCanDoThis();
+error WrongMintPrice();
+
 
 contract Ownable {
     address public owner;
@@ -32,12 +34,26 @@ contract Ownable {
 contract MyNFT is Ownable, ERC721 {
     using Strings for uint256;
 
+    uint256 public tokenCount;
+    uint256 public mintPrice;
     string public baseURI;
 
-    constructor(string memory myName, string memory mySymbol)
+
+    constructor(string memory _myName, string memory _mySymbol, uint256 _price)
         Ownable(msg.sender)
-        ERC721(myName, mySymbol)
-    {}
+        ERC721(_myName, _mySymbol)
+    {
+        mintPrice = _price;
+    }
+
+    function mint()
+        public
+        payable
+    {
+        if (msg.value != mintPrice) revert WrongMintPrice();
+        tokenCount += 1;
+        _safeMint(msg.sender, tokenCount);
+    }
 
     function tokenURI(uint256 tokenId)
         public
@@ -60,6 +76,9 @@ contract MyNFT is Ownable, ERC721 {
         return baseURI;
     }
 
+    /*
+     * Admin functions
+     */
     function setBaseURI(string memory _newBaseURI)
         external
         onlyOwner
@@ -69,6 +88,21 @@ contract MyNFT is Ownable, ERC721 {
         return true;
     }
 
+    function setMintPrice(uint256 _newPrice)
+        external
+        onlyOwner
+        returns (bool)
+    {
+        mintPrice = _newPrice;
+        return true;
+    }
+
+    function kill()
+        external
+        onlyOwner
+    {
+        selfdestruct(payable(msg.sender));
+    }
 
 }
 
