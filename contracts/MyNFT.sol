@@ -43,8 +43,9 @@ contract MyNFT is Ownable, ERC721, VRFConsumerBaseV2 {
     // constants
     uint public constant CHAINLINK_FEE = 0.0005 * 10**18;
     bytes32 private constant CHAINLINK_HASH = 0x4b09e658ed251bcafeebbc69400383d49f344ace09b9576fe248bb02c003fe9f;
+    uint32 private constant CALLBACK_GAS_LIMIT = 2000000;
     uint16 private constant REQUEST_CONFIRMATIONS = 3;
-    uint32 private constant CALLBACK_GAS_LIMIT = 1000000;
+    uint16 private constant NUMBER_OF_WORDS = 1;
 
     // global uints
     uint256 public tokensAvailable;
@@ -57,9 +58,19 @@ contract MyNFT is Ownable, ERC721, VRFConsumerBaseV2 {
     // mappings
     mapping(uint256 => address) public requestIdToSender;
 
+    // token array
+    uint256[] public tokenPool;
+
     // Interfaces
     VRFCoordinatorV2Interface internal COORDINATER;
     LinkTokenInterface internal LINKTOKEN;
+
+    event FreshMint(
+        uint256 indexed requestId,
+        uint256 tokenId,
+        uint256 randomId,
+        address owner
+    );
 
     constructor(
         string memory _myName, 
@@ -74,13 +85,15 @@ contract MyNFT is Ownable, ERC721, VRFConsumerBaseV2 {
     {
         mintPrice = _price;
         tokensAvailable = _totalSupply;
+        tokenPool = new uint256[](_totalSupply + 1);
         subscriptionId = _subId;
         COORDINATER = VRFCoordinatorV2Interface(address(0x7a1BaC17Ccc5b313516C5E16fb24f7659aA5ebed));
         LINKTOKEN = LinkTokenInterface(address(0x326C977E6efc84E512bB9C30f76E30c160eD06FB));
+        baseURI = 'https://smart-piglets-founders-club-metadata.s3.us-east-2.amazonaws.com/';
     }
 
     function mint()
-        public
+        external
         payable
     {
         if (msg.value != mintPrice) revert WrongMintPrice();
@@ -91,11 +104,10 @@ contract MyNFT is Ownable, ERC721, VRFConsumerBaseV2 {
             subscriptionId,
             REQUEST_CONFIRMATIONS,
             CALLBACK_GAS_LIMIT,
-            1
+            NUMBER_OF_WORDS
         );
 
         requestIdToSender[requestId] = msg.sender;
-        
     }
 
     function fulfillRandomWords(uint256 _requestId, uint256[] memory randomWords)
@@ -104,7 +116,17 @@ contract MyNFT is Ownable, ERC721, VRFConsumerBaseV2 {
     {
         address newOwner = requestIdToSender[_requestId];
         uint256 randomId = randomWords[0] % tokensAvailable + 1;
-        _safeMint(newOwner, randomId);
+        uint256 tokenId;
+        if (tokenPool[randomId] == 0) {
+            tokenId = randomId;
+        }
+        else {
+            tokenId = tokenPool[randomId];
+        }
+        tokenPool[randomId] = tokensAvailable;
+        tokensAvailable -= 1;
+        _safeMint(newOwner, tokenId);
+        emit FreshMint(_requestId, tokenId, randomId, newOwner);
     }
 
     function tokenURI(uint256 tokenId)

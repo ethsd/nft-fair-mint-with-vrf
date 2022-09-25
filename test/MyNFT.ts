@@ -6,6 +6,8 @@ import { ethers } from "hardhat";
 const myName = "Smart Piglets NFT project";
 const mySymbol = "SPNFT";
 const mintPrice = 0;
+const totalSupply = 10;
+const subscriptionId = Math.floor(Math.random() * 1000);
 
 describe("MyNFT", function() {
     async function deployNFTFixture() {
@@ -14,7 +16,13 @@ describe("MyNFT", function() {
         const [owner, otherAccount] = await ethers.getSigners();
 
         const NFTContract = await ethers.getContractFactory("MyNFT");
-        const contract = await NFTContract.deploy(myName, mySymbol, mintPrice);
+        const contract = await NFTContract.deploy(
+            myName, 
+            mySymbol, 
+            mintPrice,
+            totalSupply,
+            subscriptionId
+        );
 
         return { contract, owner, otherAccount };
     }
@@ -33,6 +41,16 @@ describe("MyNFT", function() {
         it.skip("Should have the correct mint price", async () => { 
             const { contract } = await loadFixture(deployNFTFixture);
             // expect(await contract.mintPrice()).to.equal(0);
+        });
+
+        it.skip("Should have the correct token supply", async () => { 
+            const { contract } = await loadFixture(deployNFTFixture);
+            expect(await contract.tokensAvailable()).to.equal(totalSupply);
+        });
+
+        it.skip("Should have the correct subscription id", async () => { 
+            const { contract } = await loadFixture(deployNFTFixture);
+            expect(await contract.subscriptionId()).to.equal(subscriptionId);
         });
     });
 })
