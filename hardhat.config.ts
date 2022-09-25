@@ -2,6 +2,9 @@ const conf = require("config");
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 
+
+// https://wiki.polygon.technology/docs/develop/hardhat/
+
 // const config: HardhatUserConfig = {
 //   solidity: "0.8.17",
 // };
