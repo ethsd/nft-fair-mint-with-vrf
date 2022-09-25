@@ -2,6 +2,7 @@
 pragma solidity ^0.8.9;
 
 import "./openzeppelin/ERC721.sol";
+import "./openzeppelin/ERC721Enumerable.sol";
 import "./openzeppelin/Strings.sol";
 import "./chainlink/VRFCoordinatorV2Interface.sol";
 import "./chainlink/VRFConsumerBaseV2.sol";
@@ -36,7 +37,7 @@ contract Ownable {
 
 // VRF Subscription ID 2003: https://vrf.chain.link/mumbai/2003
 
-contract MyNFT is Ownable, ERC721, VRFConsumerBaseV2 {
+contract MyNFT is Ownable, ERC721, ERC721Enumerable, VRFConsumerBaseV2 {
     using Strings for uint256;
 
     // constants
@@ -86,6 +87,17 @@ contract MyNFT is Ownable, ERC721, VRFConsumerBaseV2 {
         subscriptionId = _subId;
         COORDINATER = VRFCoordinatorV2Interface(address(0x7a1BaC17Ccc5b313516C5E16fb24f7659aA5ebed));
         baseURI = 'https://smart-piglets-founders-club-metadata.s3.us-east-2.amazonaws.com/';
+    }
+
+    function _beforeTokenTransfer(
+        address _from,
+        address _to,
+        uint256 _tokenId
+    )
+        internal
+        override(ERC721, ERC721Enumerable)
+    {
+        super._beforeTokenTransfer(_from, _to, _tokenId);
     }
 
     function mint()
@@ -197,6 +209,13 @@ contract MyNFT is Ownable, ERC721, VRFConsumerBaseV2 {
     {
         subscriptionId = _subId;
         return true;
+    }
+
+    function withdraw()
+        external
+        onlyOwner
+    {
+        payable(msg.sender).transfer(address(this).balance);
     }
 
     function kill()
