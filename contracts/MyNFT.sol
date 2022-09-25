@@ -4,7 +4,6 @@ pragma solidity ^0.8.9;
 import "./openzeppelin/ERC721.sol";
 import "./openzeppelin/Strings.sol";
 import "./chainlink/VRFCoordinatorV2Interface.sol";
-import "./chainlink/LinkTokenInterface.sol";
 import "./chainlink/VRFConsumerBaseV2.sol";
 
 error OnlyTheOwnerCanDoThis();
@@ -41,7 +40,6 @@ contract MyNFT is Ownable, ERC721, VRFConsumerBaseV2 {
     using Strings for uint256;
 
     // constants
-    uint public constant CHAINLINK_FEE = 0.0005 * 10**18;
     bytes32 private constant CHAINLINK_HASH = 0x4b09e658ed251bcafeebbc69400383d49f344ace09b9576fe248bb02c003fe9f;
     uint32 private constant CALLBACK_GAS_LIMIT = 2000000;
     uint16 private constant REQUEST_CONFIRMATIONS = 3;
@@ -63,7 +61,6 @@ contract MyNFT is Ownable, ERC721, VRFConsumerBaseV2 {
 
     // Interfaces
     VRFCoordinatorV2Interface internal COORDINATER;
-    LinkTokenInterface internal LINKTOKEN;
 
     event FreshMint(
         uint256 indexed requestId,
@@ -88,7 +85,6 @@ contract MyNFT is Ownable, ERC721, VRFConsumerBaseV2 {
         tokenPool = new uint256[](_totalSupply + 1);
         subscriptionId = _subId;
         COORDINATER = VRFCoordinatorV2Interface(address(0x7a1BaC17Ccc5b313516C5E16fb24f7659aA5ebed));
-        LINKTOKEN = LinkTokenInterface(address(0x326C977E6efc84E512bB9C30f76E30c160eD06FB));
         baseURI = 'https://smart-piglets-founders-club-metadata.s3.us-east-2.amazonaws.com/';
     }
 
@@ -110,6 +106,17 @@ contract MyNFT is Ownable, ERC721, VRFConsumerBaseV2 {
         requestIdToSender[requestId] = msg.sender;
     }
 
+    function swap(uint256 _index)
+        internal
+        view
+        returns (uint256)
+    {
+        if (tokenPool[_index] == 0) {
+            return _index;
+        }
+        return tokenPool[_index];
+    }
+
     function fulfillRandomWords(uint256 _requestId, uint256[] memory randomWords)
         internal
         override
@@ -117,13 +124,25 @@ contract MyNFT is Ownable, ERC721, VRFConsumerBaseV2 {
         address newOwner = requestIdToSender[_requestId];
         uint256 randomId = randomWords[0] % tokensAvailable + 1;
         uint256 tokenId;
-        if (tokenPool[randomId] == 0) {
+        if (tokensAvailable == 1) {
+            if (tokenPool[1] == 0) {
+                tokenId = 1;
+            }
+            else {
+                tokenId = tokenPool[1];
+            }
+        }
+        else if (tokenPool[randomId] == 0) {
             tokenId = randomId;
         }
         else {
             tokenId = tokenPool[randomId];
         }
-        tokenPool[randomId] = tokensAvailable;
+        // swap if not at tail position
+        if (randomId != tokensAvailable) {
+            // not tail position, swap
+            tokenPool[randomId] = swap(tokensAvailable);
+        }
         tokensAvailable -= 1;
         _safeMint(newOwner, tokenId);
         emit FreshMint(_requestId, tokenId, randomId, newOwner);
