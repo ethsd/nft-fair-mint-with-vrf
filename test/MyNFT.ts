@@ -38,19 +38,22 @@ describe("MyNFT", function() {
             expect(await contract.symbol()).to.equal(mySymbol);
         });
 
-        it.skip("Should have the correct mint price", async () => { 
+        it("Should have the correct mint price", async () => { 
             const { contract } = await loadFixture(deployNFTFixture);
-            // expect(await contract.mintPrice()).to.equal(0);
+            // make a passing expect statement
+            expect(await contract.mintPrice()).to.equal("replace me");
         });
 
-        it.skip("Should have the correct token supply", async () => { 
+        it("Should have the correct token supply", async () => { 
             const { contract } = await loadFixture(deployNFTFixture);
-            expect(await contract.tokensAvailable()).to.equal(totalSupply);
+            // add a passing expect statement
+            await expect.fail("replace with passing test");
         });
 
-        it.skip("Should have the correct subscription id", async () => { 
+        it("Should have the correct subscription id", async () => { 
             const { contract } = await loadFixture(deployNFTFixture);
-            expect(await contract.subscriptionId()).to.equal(subscriptionId);
+            // add a passing expect statement
+            await expect.fail("replace with passing test");
         });
     });
 })

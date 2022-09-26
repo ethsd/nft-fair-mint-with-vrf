@@ -1,6 +1,24 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.9;
 
+/*
+ * 88888888ba,   88  ad88888ba    ,ad8888ba,  88                 db        88 88b           d88 88888888888 88888888ba   
+ * 88      `"8b  88 d8"     "8b  d8"'    `"8b 88                d88b       88 888b         d888 88          88      "8b  
+ * 88        `8b 88 Y8,         d8'           88               d8'`8b      88 88`8b       d8'88 88          88      ,8P  
+ * 88         88 88 `Y8aaaaa,   88            88              d8'  `8b     88 88 `8b     d8' 88 88aaaaa     88aaaaaa8P'  
+ * 88         88 88   `"""""8b, 88            88             d8YaaaaY8b    88 88  `8b   d8'  88 88"""""     88""""88'    
+ * 88         8P 88         `8b Y8,           88            d8""""""""8b   88 88   `8b d8'   88 88          88    `8b    
+ * 88      .a8P  88 Y8a     a8P  Y8a.    .a8P 88           d8'        `8b  88 88    `888'    88 88          88     `8b   
+ * 88888888Y"'   88  "Y88888P"    `"Y8888Y"'  88888888888 d8'          `8b 88 88     `8'     88 88888888888 88      `8b
+ * 
+ * This code is for demonstration purposes only!
+ * Do not use this code in production.
+ * This code is designed to be used as an educational 
+ * aid to accompany the live coding session
+ * of the Smart Piglets fair mint NFT art campaign
+ * presentation hosted by ETH SD on Tuesday September 27th 2022.
+*/
+
 import "./openzeppelin/ERC721.sol";
 import "./openzeppelin/ERC721Enumerable.sol";
 import "./openzeppelin/Strings.sol";
