@@ -9,7 +9,10 @@ async function main() {
 
     let file = await readFile('deployed.txt', {encoding: 'utf-8'});
     let contracts = file.split('\n');
-    let contractAddress = contracts[contracts.length - 1];
+    let contractAddress = 
+        (contracts[contracts.length - 1]) === '' 
+            ? contracts[contracts.length - 2] 
+            : contracts[contracts.length - 1];
     console.log(`using contract address: ${contractAddress}`);
 
     let contractJSON = await readFile(abiPath, { encoding: 'utf-8'});
